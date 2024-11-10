@@ -1,0 +1,8 @@
+package: v1
+generate:
+  models: true
+output: internal/delivery/http/gen/user/v1/models.gen.go
+output-options:
+  nullable-type: true
+  include-tags:
+    - user

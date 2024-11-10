@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package user.v1;
+
+option go_package = "user/v1";
+
+/**
+ * UserService is the service that provides access to users
+ * for other services. 
+ * It is assumed that consumers pass the userID 
+ * when making requests on their behalf 
+ * in the context metadata (key: x-user).
+ */
+service UserService {
+}

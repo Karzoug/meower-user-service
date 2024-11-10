@@ -1,0 +1,8 @@
+package: v1
+output: internal/delivery/http/gen/user/v1/rest.gen.go
+generate:
+  strict-server: true
+  std-http-server: true
+output-options:
+  include-tags:
+    - user

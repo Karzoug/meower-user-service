@@ -1,0 +1,441 @@
+openapi: 3.0.1
+info:
+  version: 0.3.0
+  title: Meower REST API
+  description: API for common CRUD operations.
+
+servers:
+  - url: https://meower.com/{basePath}
+    description: The production API server.
+    variables:
+      basePath:
+        default: api/v1
+
+security:
+  - oAuth:
+    - general
+
+paths:
+  /users/{userID}:
+    parameters:
+      - name: userID
+        in: path
+        required: true
+        description: The id of the user.
+        schema:
+          type: string
+    put:
+      tags:
+        - user
+      summary: Update the user.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+      responses:
+        '200':
+          description: User updated.
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /posts/:
+    post:
+      tags:
+        - post
+      summary: Create a new post.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewPost'
+      responses:
+        '201':
+          description: Post created.
+          content: 
+            application/json: 
+              schema:
+                $ref: '#/components/schemas/CreatePostResponse'
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /posts/{postID}:
+    parameters:
+      - name: postID
+        in: path
+        required: true
+        description: The id of the post.
+        schema:
+          type: string
+    put:
+      tags:
+        - post
+      summary: Replace content of the post.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Post'
+      responses:
+        '200':
+          description: Post edited.
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    delete:
+      tags:
+        - post
+      summary: Delete the post.
+      responses:
+        '200':
+          description: Post deleted.
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /relation/followings:
+    post:
+      tags:
+        - relation
+      summary: Follow user.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserIdRequest'
+      responses:
+        '201':
+          description: User followed.
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /relation/followings/{userID}:
+    delete:
+      tags:
+        - relation
+      summary: Unfollow user.
+      parameters:
+        - name: userID
+          in: path
+          required: true
+          description: The userID of the user to unfollow.
+          schema:
+            type: string
+      responses:
+        '200':
+          description: User unfollowed.
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /relation/hidden:
+    post:
+      tags:
+        - relation
+      summary: Hide the user.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserIdRequest'
+      responses:
+        '201':
+          description: User hidden.
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /relation/hidden/{userID}:
+    delete:
+      tags:
+        - relation
+      summary: Unhide the user.
+      parameters:
+        - name: userID
+          in: path
+          required: true
+          description: The userID of the user to unhide.
+          schema:
+            type: string
+      responses:
+        '200':
+          description: User unhidden.
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /compose/timeline/{userID}:
+    get:
+      tags:
+        - compose
+      summary: Get posts list by userID.
+      parameters:
+        - name: userID
+          in: path
+          required: true
+          description: UserID of the user or "me" for the current user.
+          schema:
+            type: string
+        - name: pageToken
+          in: query
+          schema:
+            type: string
+            default: ""
+          description: The token to get the next page of results.
+        - name: maxPageSize
+          in: query
+          schema:
+            type: integer
+            default: 20
+            minimum: 1
+            maximum: 100
+          description: The maximum number of items to return.
+      responses:
+        '200':
+          description: User's posts list.
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/ListComposePostsResponse'
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /compose/timeline/home:
+    get:
+      tags:
+        - compose
+      summary: Get home timeline current authenticated user.
+      parameters:
+        - name: pageToken
+          in: query
+          schema:
+            type: string
+            default: ""
+          description: The token to get the next page of results.
+        - name: maxPageSize
+          in: query
+          schema:
+            type: integer
+            default: 20
+            minimum: 1
+            maximum: 100
+          description: The maximum number of items to return.
+      responses:
+        '200':
+          description: Posts list in home timeline.
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/ListComposePostsResponse'
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /compose/posts/{postID}:
+    get:
+      tags:
+        - compose
+      summary: Get a post with the given id.
+      parameters:
+        - name: postID
+          in: path
+          required: true
+          description: The id of the post.
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The post.
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/GetComposePostResponse'
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+
+
+components:
+  securitySchemes:
+    oAuth:
+      type: oauth2
+      description: This API uses OAuth2 with the “Authorization Code with Proof Key of Code Exchange (PKCE)” (RFC7636) flow.
+      flows:
+         authorizationCode:
+          authorizationUrl: https://auth.meower.com/oauth/v2/authorize
+          tokenUrl: https://auth.meower.com/oauth/v2/token
+          refreshUrl: https://auth.meower.com/oauth/v2/token
+          scopes:
+            general: ""
+  schemas:
+    NewPost:
+      type: object
+      properties:
+        text:
+          type: string
+          description: Text of the post.
+      required:
+        - text
+    CreatePostResponse:
+      description: The created post id.
+      type: object
+      properties:
+        id:
+          type: string
+          description: The id of the post.
+      required:
+        - id
+
+    UserIdRequest:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The id of the user.
+      required:
+        - id
+
+    ShortUserInfo:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The id of the user.
+          example: NArmstrong
+        name:
+          type: string
+          description: The name of the user.
+          example: Neil Armstrong
+        imageUrl:
+          type: string
+          format: uri
+          description: The image url of the user.
+          nullable: true
+        statusText:
+          type: string
+          description: The status text of the user.
+          nullable: true
+      required:
+        - id
+        - name
+    GetComposePostResponse:
+      description: The post.
+      type: object
+      properties:
+        post:
+          allOf:
+            - $ref: '#/components/schemas/Post'
+        user:
+          allOf:
+            - $ref: '#/components/schemas/ShortUserInfo'
+    ListComposePostsResponse:
+      description: The list of posts.
+      type: object
+      properties:
+        posts:
+          type: array
+          items:
+            $ref: '#/components/schemas/Post'
+        users:
+          type: array
+          items:
+            $ref: '#/components/schemas/ShortUserInfo'
+        nextPageToken:
+          type: string
+          description: The token to get the next page of results, ommitted or empty if there are no more results. You should expect the token to have a lifetime of at least an hour.
+      required:
+        - posts
+
+    Post:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The id of the post.
+          example: 671ed17d0e6d38baa79b4dda
+        text:
+          type: string
+          description: Text of the post.
+          example: That’s one small step for a man, but one giant leap for mankind.
+        authorId:
+          type: string
+          description: User ID of the author.
+          example: NArmstrong
+        updatedAt:
+          type: string
+          format: date-time
+          description: Date and time of the post last update.
+      required:
+        - id
+        - text
+        - authorId
+        - updatedAt
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The id of the user.
+          example: NArmstrong
+        name:
+          type: string
+          description: The name of the user.
+          example: Neil Armstrong
+        imageUrl:
+          type: string
+          format: uri
+          description: The image url of the user.
+        statusText:
+          type: string
+          description: The status text of the user.
+      required:
+        - id
+        - name
+        - imageUrl
+        - statusText
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+          description: Description of the error.
+      required:
+        - error
