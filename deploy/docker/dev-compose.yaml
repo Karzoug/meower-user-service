@@ -1,0 +1,42 @@
+services:
+  prometheus:
+    image: prom/prometheus
+    container_name: prometheus
+    command:
+      - '--config.file=/etc/prometheus/dev-prom.yaml'
+    ports:
+       - 9090:9090
+    restart: unless-stopped
+    volumes:
+      - ./../metric/dev:/etc/prometheus
+
+  jaeger:
+    image: jaegertracing/all-in-one:1.60
+    container_name: jaeger
+    environment:
+      - COLLECTOR_OTLP_ENABLED=true
+    hostname: jaeger
+    ports:
+      - 16686:16686
+    #   - 4317:4317
+    #   - 4318:4318
+    #   - 14268:14268
+    restart: unless-stopped
+
+  user-service:
+    depends_on:
+      jaeger:
+        condition: service_started
+      prometheus:
+        condition: service_started
+    image: ${IMAGE}
+    container_name: user-service
+    environment:
+      OTLP_PROBABILITY: 1
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://jaeger:4318
+      OTEL_EXPORTER_OTLP_INSECURE: true
+      LOG_LEVEL: debug
+    ports:
+       - 3001:3001
+       - 3002:3002
+    restart: unless-stopped
