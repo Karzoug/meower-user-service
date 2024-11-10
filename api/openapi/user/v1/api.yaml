@@ -348,11 +348,10 @@ components:
           type: string
           format: uri
           description: The image url of the user.
-          nullable: true
         statusText:
           type: string
           description: The status text of the user.
-          nullable: true
+          example: That's one small step for man. One giant leap for mankind.
       required:
         - id
         - name
@@ -418,6 +417,8 @@ components:
         name:
           type: string
           description: The name of the user.
+          minLength: 1
+          maxLength: 50
           example: Neil Armstrong
         imageUrl:
           type: string
@@ -426,6 +427,8 @@ components:
         statusText:
           type: string
           description: The status text of the user.
+          maxLength: 200
+          example: That's one small step for man. One giant leap for mankind.
       required:
         - id
         - name

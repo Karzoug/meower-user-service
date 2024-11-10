@@ -69,7 +69,7 @@ func Run(ctx context.Context, logger zerolog.Logger) error {
 	defer doClose(shutdownMeter, logger)
 
 	// set up service
-	_ = service.NewUserService()
+	_ = service.NewUserService(nil)
 
 	// set up http server
 	httpSrv := httpServer.New(
