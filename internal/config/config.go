@@ -4,6 +4,7 @@ import (
 	grpc "github.com/Karzoug/meower-user-service/internal/delivery/grpc/server"
 	httpConfig "github.com/Karzoug/meower-user-service/internal/delivery/http/config"
 	"github.com/Karzoug/meower-user-service/pkg/metric/prom"
+	"github.com/Karzoug/meower-user-service/pkg/postgresql"
 	"github.com/Karzoug/meower-user-service/pkg/trace/otlp"
 
 	"github.com/rs/zerolog"
@@ -15,4 +16,5 @@ type Config struct {
 	GRPC     grpc.Config             `envPrefix:"GRPC_"`
 	PromHTTP prom.ServerConfig       `envPrefix:"PROM_"`
 	OTLP     otlp.Config             `envPrefix:"OTLP_"`
+	PG       postgresql.Config       `envPrefix:"PG_"`
 }

@@ -14,10 +14,12 @@ import (
 	grpcServer "github.com/Karzoug/meower-user-service/internal/delivery/grpc/server"
 	healthHandlers "github.com/Karzoug/meower-user-service/internal/delivery/http/handler/health"
 	httpServer "github.com/Karzoug/meower-user-service/internal/delivery/http/server"
+	userRepo "github.com/Karzoug/meower-user-service/internal/user/repo/pg"
 	"github.com/Karzoug/meower-user-service/internal/user/service"
 	"github.com/Karzoug/meower-user-service/pkg/buildinfo"
 	"github.com/Karzoug/meower-user-service/pkg/healthcheck"
 	"github.com/Karzoug/meower-user-service/pkg/metric/prom"
+	"github.com/Karzoug/meower-user-service/pkg/postgresql"
 	"github.com/Karzoug/meower-user-service/pkg/trace/otlp"
 )
 
@@ -68,8 +70,14 @@ func Run(ctx context.Context, logger zerolog.Logger) error {
 	}
 	defer doClose(shutdownMeter, logger)
 
+	db, err := postgresql.NewDB(ctxInit, cfg.PG)
+	if err != nil {
+		return err
+	}
+	defer doClose(db.Close, logger)
+
 	// set up service
-	_ = service.NewUserService(nil)
+	_ = service.NewUserService(userRepo.NewUserRepo(db))
 
 	// set up http server
 	httpSrv := httpServer.New(
