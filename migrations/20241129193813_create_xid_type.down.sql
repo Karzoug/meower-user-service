@@ -1,0 +1,10 @@
+DROP FUNCTION IF EXISTS public.xid_counter(_xid public.xid);
+DROP FUNCTION IF EXISTS public.xid_pid(_xid public.xid);
+DROP FUNCTION IF EXISTS public.xid_machine(public.xid);
+DROP FUNCTION IF EXISTS public.xid_time(public.xid);
+DROP FUNCTION IF EXISTS xid(_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP);
+DROP FUNCTION IF EXISTS public.xid_decode(public.xid);
+DROP FUNCTION IF EXISTS public.xid_encode(int[]);
+DROP FUNCTION IF EXISTS public._xid_machine_id();
+DROP SEQUENCE IF NOT EXISTS public.xid_serial;
+DROP DOMAIN IF EXISTS public.xid;
