@@ -10,6 +10,7 @@ import (
 	"go.opentelemetry.io/otel"
 	"golang.org/x/sync/errgroup"
 
+	"github.com/Karzoug/meower-common-go/memcached"
 	"github.com/Karzoug/meower-common-go/metric/prom"
 	"github.com/Karzoug/meower-common-go/postgresql"
 	"github.com/Karzoug/meower-common-go/trace/otlp"
@@ -18,6 +19,7 @@ import (
 	healthHandler "github.com/Karzoug/meower-user-service/internal/delivery/grpc/handler/health"
 	userHandler "github.com/Karzoug/meower-user-service/internal/delivery/grpc/handler/user"
 	grpcServer "github.com/Karzoug/meower-user-service/internal/delivery/grpc/server"
+	userCache "github.com/Karzoug/meower-user-service/internal/user/repo/memcached"
 	userRepo "github.com/Karzoug/meower-user-service/internal/user/repo/pg"
 	"github.com/Karzoug/meower-user-service/internal/user/service"
 	"github.com/Karzoug/meower-user-service/pkg/buildinfo"
@@ -76,10 +78,17 @@ func Run(ctx context.Context, logger zerolog.Logger) error {
 	}
 	defer doClose(db.Close, logger)
 
+	cache, err := memcached.NewStaticClient(ctxInit, cfg.Memcached, logger)
+	if err != nil {
+		return err
+	}
+	defer doClose(cache.Close, logger)
+
 	// set up service
 	us := service.NewUserService(
+		cfg.Service,
 		userRepo.NewUserRepo(db),
-		nil,
+		userCache.NewUserCache(cache),
 		logger,
 	)
 
