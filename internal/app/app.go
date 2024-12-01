@@ -70,6 +70,8 @@ func Run(ctx context.Context, logger zerolog.Logger) error {
 
 	// set up service
 	us := service.NewUserService(
+		nil,
+		nil,
 		logger,
 	)
 
