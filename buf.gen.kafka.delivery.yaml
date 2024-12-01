@@ -2,10 +2,13 @@ version: v2
 clean: true
 plugins:
   - local: /var/tmp/meower/user/bin/protoc-gen-go
-    out: internal/delivery/grpc/gen/
+    out: internal/delivery/kafka/gen/
     opt: paths=source_relative
   - local: /var/tmp/meower/user/bin/protoc-gen-go-grpc
-    out: internal/delivery/grpc/gen
+    out: internal/delivery/kafka/gen
     opt: paths=source_relative
 inputs:
-  - directory: api/proto
+  - git_repo: https://github.com/Karzoug/meower-api
+    subdir: proto
+    paths: 
+      - auth/v1/kafka.proto

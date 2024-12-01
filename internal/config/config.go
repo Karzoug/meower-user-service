@@ -7,6 +7,7 @@ import (
 	"github.com/Karzoug/meower-common-go/trace/otlp"
 
 	grpcSrv "github.com/Karzoug/meower-user-service/internal/delivery/grpc/server"
+	"github.com/Karzoug/meower-user-service/internal/delivery/kafka"
 	"github.com/Karzoug/meower-user-service/internal/user/service"
 
 	"github.com/rs/zerolog"
@@ -20,4 +21,5 @@ type Config struct {
 	Service   service.Config    `envPrefix:"SERVICE_"`
 	PG        postgresql.Config `envPrefix:"PG_"`
 	Memcached memcached.Config  `envPrefix:"MEMCACHED_"`
+	Kafka     kafka.Config      `envPrefix:"KAFKA_"`
 }

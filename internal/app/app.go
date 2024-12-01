@@ -19,6 +19,7 @@ import (
 	healthHandler "github.com/Karzoug/meower-user-service/internal/delivery/grpc/handler/health"
 	userHandler "github.com/Karzoug/meower-user-service/internal/delivery/grpc/handler/user"
 	grpcServer "github.com/Karzoug/meower-user-service/internal/delivery/grpc/server"
+	"github.com/Karzoug/meower-user-service/internal/delivery/kafka"
 	userCache "github.com/Karzoug/meower-user-service/internal/user/repo/memcached"
 	userRepo "github.com/Karzoug/meower-user-service/internal/user/repo/pg"
 	"github.com/Karzoug/meower-user-service/internal/user/service"
@@ -103,10 +104,20 @@ func Run(ctx context.Context, logger zerolog.Logger) error {
 		logger,
 	)
 
+	// set up kafka consumer
+	uc, err := kafka.NewConsumer(ctxInit, cfg.Kafka, us, logger)
+	if err != nil {
+		return err
+	}
+
 	eg, ctx := errgroup.WithContext(ctx)
 	// run service grpc server
 	eg.Go(func() error {
 		return grpcSrv.Run(ctx)
+	})
+	// run kafka consumer
+	eg.Go(func() error {
+		return uc.Run(ctx)
 	})
 	// run prometheus metrics http server
 	eg.Go(func() error {
