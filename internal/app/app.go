@@ -14,7 +14,8 @@ import (
 	"github.com/Karzoug/meower-common-go/trace/otlp"
 
 	"github.com/Karzoug/meower-user-service/internal/config"
-	healthGrpc "github.com/Karzoug/meower-user-service/internal/delivery/grpc/handler/health"
+	healthHandler "github.com/Karzoug/meower-user-service/internal/delivery/grpc/handler/health"
+	userHandler "github.com/Karzoug/meower-user-service/internal/delivery/grpc/handler/user"
 	grpcServer "github.com/Karzoug/meower-user-service/internal/delivery/grpc/server"
 	"github.com/Karzoug/meower-user-service/internal/user/service"
 	"github.com/Karzoug/meower-user-service/pkg/buildinfo"
@@ -68,7 +69,7 @@ func Run(ctx context.Context, logger zerolog.Logger) error {
 	defer doClose(shutdownMeter, logger)
 
 	// set up service
-	_ = service.NewUserService(
+	us := service.NewUserService(
 		logger,
 	)
 
@@ -76,7 +77,8 @@ func Run(ctx context.Context, logger zerolog.Logger) error {
 	grpcSrv := grpcServer.New(
 		cfg.GRPC,
 		[]grpcServer.ServiceRegister{
-			healthGrpc.RegisterService(),
+			healthHandler.RegisterService(),
+			userHandler.RegisterService(us),
 		},
 		tracer,
 		logger,
