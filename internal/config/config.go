@@ -2,6 +2,7 @@ package config
 
 import (
 	"github.com/Karzoug/meower-common-go/metric/prom"
+	"github.com/Karzoug/meower-common-go/postgresql"
 	"github.com/Karzoug/meower-common-go/trace/otlp"
 
 	grpcConfig "github.com/Karzoug/meower-user-service/internal/delivery/grpc/server"
@@ -14,4 +15,5 @@ type Config struct {
 	GRPC     grpcConfig.Config `envPrefix:"GRPC_"`
 	PromHTTP prom.ServerConfig `envPrefix:"PROM_"`
 	OTLP     otlp.Config       `envPrefix:"OTLP_"`
+	PG       postgresql.Config `envPrefix:"PG_"`
 }

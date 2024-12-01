@@ -11,12 +11,14 @@ import (
 	"golang.org/x/sync/errgroup"
 
 	"github.com/Karzoug/meower-common-go/metric/prom"
+	"github.com/Karzoug/meower-common-go/postgresql"
 	"github.com/Karzoug/meower-common-go/trace/otlp"
 
 	"github.com/Karzoug/meower-user-service/internal/config"
 	healthHandler "github.com/Karzoug/meower-user-service/internal/delivery/grpc/handler/health"
 	userHandler "github.com/Karzoug/meower-user-service/internal/delivery/grpc/handler/user"
 	grpcServer "github.com/Karzoug/meower-user-service/internal/delivery/grpc/server"
+	userRepo "github.com/Karzoug/meower-user-service/internal/user/repo/pg"
 	"github.com/Karzoug/meower-user-service/internal/user/service"
 	"github.com/Karzoug/meower-user-service/pkg/buildinfo"
 )
@@ -68,9 +70,15 @@ func Run(ctx context.Context, logger zerolog.Logger) error {
 	}
 	defer doClose(shutdownMeter, logger)
 
+	db, err := postgresql.NewDB(ctxInit, cfg.PG)
+	if err != nil {
+		return err
+	}
+	defer doClose(db.Close, logger)
+
 	// set up service
 	us := service.NewUserService(
-		nil,
+		userRepo.NewUserRepo(db),
 		nil,
 		logger,
 	)
