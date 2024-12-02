@@ -27,3 +27,11 @@ scrape_configs:
   static_configs:
   - targets:
     - user-service:3002
+- job_name: user-outbox
+  honor_timestamps: true
+  scrape_interval: 5s
+  metrics_path: /metrics
+  scheme: http
+  static_configs:
+  - targets:
+    - user-outbox:3002

@@ -54,6 +54,14 @@ services:
       - KAFKA_CFG_CONTROLLER_QUORUM_VOTERS=0@kafka:9093
       - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
 
+  panda-console:
+    image: redpandadata/console
+    container_name: panda-console
+    ports:
+      - 3004:8080
+    environment:
+      KAFKA_BROKERS: kafka:9092
+
   prometheus:
     image: prom/prometheus
     container_name: prometheus
@@ -90,7 +98,7 @@ services:
         condition: service_started
       prometheus:
         condition: service_started
-    image: ${IMAGE}
+    image: ${IMAGE_SERVICE}
     container_name: user-service
     environment:
       OTLP_PROBABILITY: 1
@@ -102,5 +110,22 @@ services:
       KAFKA_BROKERS: kafka:9092
     ports:
        - 3001:3001
-       - 3002:3002
+    #   - 3002:3002
+    restart: unless-stopped
+
+  user-outbox:
+    depends_on:
+      postgres:
+        condition: service_healthy
+      kafka:
+        condition: service_started
+      prometheus:
+        condition: service_started
+    image: ${IMAGE_OUTBOX}
+    container_name: user-outbox
+    environment:
+      LOG_LEVEL: info
+      PG_URI: postgresql://user:password@postgres:5432/meower?sslmode=disable
+      KAFKA_BROKERS: kafka:9092
+      METRIC_PORT: 3002
     restart: unless-stopped

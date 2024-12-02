@@ -3,11 +3,13 @@
 
 SERVICE_VERSION            := 0.1.0
 SERVICE_NAME               := user-service
+OUTBOX_VERSION             := 0.1.0
 BUILD_VERSION              ?= $(shell git symbolic-ref HEAD 2> /dev/null | cut -b 12-)-$(shell git log --pretty=format:\"%h\" -1)
 BUILD_DATE                 ?= $(shell date +%FT%T%z)
 
-BASE_IMAGE                 := meower/service
-IMAGE                      := $(BASE_IMAGE)/user:$(SERVICE_VERSION)
+BASE_IMAGE                 := meower
+IMAGE_SERVICE              := $(BASE_IMAGE)/service/user:$(SERVICE_VERSION)
+IMAGE_OUTBOX               := $(BASE_IMAGE)/outbox/user:$(OUTBOX_VERSION)
 
 GOLANGCI_LINT_VERSION      := 1.61.0
 BUF_VERSION                := 1.46.0
@@ -145,7 +147,7 @@ dev-install-deps:
 service:
 	docker build \
 		-f build/dockerfile.service \
-		-t $(IMAGE) \
+		-t $(IMAGE_SERVICE) \
 		--build-arg BUILD_REF=$(BUILD_VERSION) \
 		--build-arg BUILD_DATE=$(BUILD_DATE) \
 		--build-arg VERSION=$(SERVICE_VERSION) \
@@ -157,7 +159,7 @@ service:
 # Run docker compose to test service locally
 
 dev-compose-up:
-	IMAGE=$(IMAGE) docker compose -f deploy/docker/dev-compose.yaml  up -d
+	IMAGE_SERVICE=$(IMAGE_SERVICE) IMAGE_OUTBOX=$(IMAGE_OUTBOX) docker compose -f deploy/docker/dev-compose.yaml  up -d
 
 dev-compose-down:
-	IMAGE=$(IMAGE) docker compose -v -f deploy/docker/dev-compose.yaml down
+	IMAGE_SERVICE=$(IMAGE_SERVICE) IMAGE_OUTBOX=$(IMAGE_OUTBOX) docker compose -v -f deploy/docker/dev-compose.yaml down
