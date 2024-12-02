@@ -54,9 +54,8 @@ func Run(ctx context.Context, logger zerolog.Logger) error {
 	// set up tracer
 	cfg.OTLP.ServiceName = serviceName
 	cfg.OTLP.ServiceVersion = serviceVersion
-	cfg.OTLP.ExcludedRoutes = map[string]struct{}{
-		"/readiness": {},
-		"/liveness":  {},
+	cfg.OTLP.ExcludedGrpcMethods = map[string]string{
+		"grpc.health.v1.Health": "Check",
 	}
 	shutdownTracer, err := otlp.RegisterGlobal(ctxInit, cfg.OTLP)
 	if err != nil {

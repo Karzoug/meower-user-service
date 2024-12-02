@@ -3,7 +3,7 @@ module github.com/Karzoug/meower-user-service
 go 1.23.3
 
 require (
-	github.com/Karzoug/meower-common-go v1.0.3
+	github.com/Karzoug/meower-common-go v1.1.0
 	github.com/bradfitz/gomemcache v0.0.0-20230905024940-24af94b03874
 	github.com/caarlos0/env/v11 v11.2.2
 	github.com/cenkalti/backoff/v4 v4.3.0
@@ -49,11 +49,11 @@ require (
 	go.opentelemetry.io/otel/metric v1.32.0 // indirect
 	go.opentelemetry.io/otel/sdk v1.32.0 // indirect
 	go.opentelemetry.io/otel/sdk/metric v1.32.0 // indirect
-	go.opentelemetry.io/proto/otlp v1.3.1 // indirect
+	go.opentelemetry.io/proto/otlp v1.4.0 // indirect
 	golang.org/x/crypto v0.29.0 // indirect
 	golang.org/x/net v0.31.0 // indirect
 	golang.org/x/sys v0.27.0 // indirect
 	golang.org/x/text v0.20.0 // indirect
-	google.golang.org/genproto/googleapis/api v0.0.0-20241118233622-e639e219e697 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20241118233622-e639e219e697 // indirect
+	google.golang.org/genproto/googleapis/api v0.0.0-20241202173237-19429a94021a // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20241202173237-19429a94021a // indirect
 )

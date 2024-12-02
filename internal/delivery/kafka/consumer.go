@@ -106,7 +106,7 @@ func (c consumer) Run(ctx context.Context) (err error) {
 				c.storeOffset(msg)
 				continue
 			}
-			eventType, ok := ck.LookupHeaderValue(msg.Headers, ck.MessageTypeHeaderKey)
+			eventType, ok := lookupHeaderValue(msg.Headers, ck.MessageTypeHeaderKey)
 			if !ok {
 				c.storeOffset(msg)
 				continue
@@ -146,4 +146,13 @@ func (c consumer) storeOffset(msg *kafka.Message) {
 			Str("key", string(msg.Key)).
 			Msg("failed to store offset after message")
 	}
+}
+
+func lookupHeaderValue(headers []kafka.Header, key string) ([]byte, bool) {
+	for _, header := range headers {
+		if header.Key == key {
+			return header.Value, true
+		}
+	}
+	return nil, false
 }
