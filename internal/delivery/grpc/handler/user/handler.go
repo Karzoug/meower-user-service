@@ -9,6 +9,7 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
+	"github.com/Karzoug/meower-common-go/auth"
 	"github.com/Karzoug/meower-user-service/internal/delivery/grpc/converter"
 	gen "github.com/Karzoug/meower-user-service/internal/delivery/grpc/gen/user/v1"
 	"github.com/Karzoug/meower-user-service/internal/user/service"
@@ -38,7 +39,7 @@ func (h handlers) GetUser(ctx context.Context, req *gen.GetUserRequest) (*gen.Us
 		return nil, status.Error(codes.InvalidArgument, "invalid id: "+req.Id)
 	}
 
-	user, err := h.userService.Get(ctx, id)
+	user, err := h.userService.Get(ctx, auth.UserIDFromContext(ctx), id)
 	if err != nil {
 		return nil, err
 	}

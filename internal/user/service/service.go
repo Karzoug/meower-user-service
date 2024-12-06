@@ -7,7 +7,6 @@ import (
 	"github.com/rs/xid"
 	"github.com/rs/zerolog"
 
-	"github.com/Karzoug/meower-common-go/auth"
 	"github.com/Karzoug/meower-common-go/ucerr"
 	"google.golang.org/grpc/codes"
 
@@ -53,8 +52,8 @@ func (us UserService) CreateByUsername(ctx context.Context, username string) (xi
 }
 
 // Update updates an existing user.
-func (us UserService) Update(ctx context.Context, u entity.User) error {
-	if auth.UserIDFromContext(ctx).Compare(u.ID) != 0 {
+func (us UserService) Update(ctx context.Context, reqUserID xid.ID, u entity.User) error {
+	if reqUserID.Compare(u.ID) != 0 {
 		return ucerr.NewError(nil,
 			"the caller does not have permission to update this user",
 			codes.PermissionDenied)
@@ -77,8 +76,8 @@ func (us UserService) Update(ctx context.Context, u entity.User) error {
 }
 
 // Get returns an existing user.
-func (us UserService) Get(ctx context.Context, id xid.ID) (entity.User, error) {
-	if auth.UserIDFromContext(ctx).Compare(id) != 0 {
+func (us UserService) Get(ctx context.Context, reqUserID xid.ID, id xid.ID) (entity.User, error) {
+	if reqUserID.Compare(id) != 0 {
 		return entity.User{}, ucerr.NewError(nil,
 			"the caller does not have permission to get this user",
 			codes.PermissionDenied)
