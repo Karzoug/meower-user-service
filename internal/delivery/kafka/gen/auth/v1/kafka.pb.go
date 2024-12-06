@@ -21,28 +21,78 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-type UserRegisteredEvent struct {
+type ChangeType int32
+
+const (
+	ChangeType_CHANGE_TYPE_UNSPECIFIED ChangeType = 0
+	ChangeType_CHANGE_TYPE_REGISTERED  ChangeType = 1
+	ChangeType_CHANGE_TYPE_DELETED     ChangeType = 2
+)
+
+// Enum value maps for ChangeType.
+var (
+	ChangeType_name = map[int32]string{
+		0: "CHANGE_TYPE_UNSPECIFIED",
+		1: "CHANGE_TYPE_REGISTERED",
+		2: "CHANGE_TYPE_DELETED",
+	}
+	ChangeType_value = map[string]int32{
+		"CHANGE_TYPE_UNSPECIFIED": 0,
+		"CHANGE_TYPE_REGISTERED":  1,
+		"CHANGE_TYPE_DELETED":     2,
+	}
+)
+
+func (x ChangeType) Enum() *ChangeType {
+	p := new(ChangeType)
+	*p = x
+	return p
+}
+
+func (x ChangeType) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (ChangeType) Descriptor() protoreflect.EnumDescriptor {
+	return file_auth_v1_kafka_proto_enumTypes[0].Descriptor()
+}
+
+func (ChangeType) Type() protoreflect.EnumType {
+	return &file_auth_v1_kafka_proto_enumTypes[0]
+}
+
+func (x ChangeType) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use ChangeType.Descriptor instead.
+func (ChangeType) EnumDescriptor() ([]byte, []int) {
+	return file_auth_v1_kafka_proto_rawDescGZIP(), []int{0}
+}
+
+type ChangedEvent struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Username string `protobuf:"bytes,1,opt,name=username,proto3" json:"username,omitempty"`
+	Username   string     `protobuf:"bytes,1,opt,name=username,proto3" json:"username,omitempty"`
+	ChangeType ChangeType `protobuf:"varint,2,opt,name=change_type,json=changeType,proto3,enum=auth.v1.ChangeType" json:"change_type,omitempty"`
 }
 
-func (x *UserRegisteredEvent) Reset() {
-	*x = UserRegisteredEvent{}
+func (x *ChangedEvent) Reset() {
+	*x = ChangedEvent{}
 	mi := &file_auth_v1_kafka_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *UserRegisteredEvent) String() string {
+func (x *ChangedEvent) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*UserRegisteredEvent) ProtoMessage() {}
+func (*ChangedEvent) ProtoMessage() {}
 
-func (x *UserRegisteredEvent) ProtoReflect() protoreflect.Message {
+func (x *ChangedEvent) ProtoReflect() protoreflect.Message {
 	mi := &file_auth_v1_kafka_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -54,28 +104,44 @@ func (x *UserRegisteredEvent) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use UserRegisteredEvent.ProtoReflect.Descriptor instead.
-func (*UserRegisteredEvent) Descriptor() ([]byte, []int) {
+// Deprecated: Use ChangedEvent.ProtoReflect.Descriptor instead.
+func (*ChangedEvent) Descriptor() ([]byte, []int) {
 	return file_auth_v1_kafka_proto_rawDescGZIP(), []int{0}
 }
 
-func (x *UserRegisteredEvent) GetUsername() string {
+func (x *ChangedEvent) GetUsername() string {
 	if x != nil {
 		return x.Username
 	}
 	return ""
 }
 
+func (x *ChangedEvent) GetChangeType() ChangeType {
+	if x != nil {
+		return x.ChangeType
+	}
+	return ChangeType_CHANGE_TYPE_UNSPECIFIED
+}
+
 var File_auth_v1_kafka_proto protoreflect.FileDescriptor
 
 var file_auth_v1_kafka_proto_rawDesc = []byte{
 	0x0a, 0x13, 0x61, 0x75, 0x74, 0x68, 0x2f, 0x76, 0x31, 0x2f, 0x6b, 0x61, 0x66, 0x6b, 0x61, 0x2e,
-	0x70, 0x72, 0x6f, 0x74, 0x6f, 0x12, 0x07, 0x61, 0x75, 0x74, 0x68, 0x2e, 0x76, 0x31, 0x22, 0x31,
-	0x0a, 0x13, 0x55, 0x73, 0x65, 0x72, 0x52, 0x65, 0x67, 0x69, 0x73, 0x74, 0x65, 0x72, 0x65, 0x64,
-	0x45, 0x76, 0x65, 0x6e, 0x74, 0x12, 0x1a, 0x0a, 0x08, 0x75, 0x73, 0x65, 0x72, 0x6e, 0x61, 0x6d,
-	0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x08, 0x75, 0x73, 0x65, 0x72, 0x6e, 0x61, 0x6d,
-	0x65, 0x42, 0x09, 0x5a, 0x07, 0x61, 0x75, 0x74, 0x68, 0x2f, 0x76, 0x31, 0x62, 0x06, 0x70, 0x72,
-	0x6f, 0x74, 0x6f, 0x33,
+	0x70, 0x72, 0x6f, 0x74, 0x6f, 0x12, 0x07, 0x61, 0x75, 0x74, 0x68, 0x2e, 0x76, 0x31, 0x22, 0x60,
+	0x0a, 0x0c, 0x43, 0x68, 0x61, 0x6e, 0x67, 0x65, 0x64, 0x45, 0x76, 0x65, 0x6e, 0x74, 0x12, 0x1a,
+	0x0a, 0x08, 0x75, 0x73, 0x65, 0x72, 0x6e, 0x61, 0x6d, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09,
+	0x52, 0x08, 0x75, 0x73, 0x65, 0x72, 0x6e, 0x61, 0x6d, 0x65, 0x12, 0x34, 0x0a, 0x0b, 0x63, 0x68,
+	0x61, 0x6e, 0x67, 0x65, 0x5f, 0x74, 0x79, 0x70, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0e, 0x32,
+	0x13, 0x2e, 0x61, 0x75, 0x74, 0x68, 0x2e, 0x76, 0x31, 0x2e, 0x43, 0x68, 0x61, 0x6e, 0x67, 0x65,
+	0x54, 0x79, 0x70, 0x65, 0x52, 0x0a, 0x63, 0x68, 0x61, 0x6e, 0x67, 0x65, 0x54, 0x79, 0x70, 0x65,
+	0x2a, 0x5e, 0x0a, 0x0a, 0x43, 0x68, 0x61, 0x6e, 0x67, 0x65, 0x54, 0x79, 0x70, 0x65, 0x12, 0x1b,
+	0x0a, 0x17, 0x43, 0x48, 0x41, 0x4e, 0x47, 0x45, 0x5f, 0x54, 0x59, 0x50, 0x45, 0x5f, 0x55, 0x4e,
+	0x53, 0x50, 0x45, 0x43, 0x49, 0x46, 0x49, 0x45, 0x44, 0x10, 0x00, 0x12, 0x1a, 0x0a, 0x16, 0x43,
+	0x48, 0x41, 0x4e, 0x47, 0x45, 0x5f, 0x54, 0x59, 0x50, 0x45, 0x5f, 0x52, 0x45, 0x47, 0x49, 0x53,
+	0x54, 0x45, 0x52, 0x45, 0x44, 0x10, 0x01, 0x12, 0x17, 0x0a, 0x13, 0x43, 0x48, 0x41, 0x4e, 0x47,
+	0x45, 0x5f, 0x54, 0x59, 0x50, 0x45, 0x5f, 0x44, 0x45, 0x4c, 0x45, 0x54, 0x45, 0x44, 0x10, 0x02,
+	0x42, 0x09, 0x5a, 0x07, 0x61, 0x75, 0x74, 0x68, 0x2f, 0x76, 0x31, 0x62, 0x06, 0x70, 0x72, 0x6f,
+	0x74, 0x6f, 0x33,
 }
 
 var (
@@ -90,16 +156,19 @@ func file_auth_v1_kafka_proto_rawDescGZIP() []byte {
 	return file_auth_v1_kafka_proto_rawDescData
 }
 
+var file_auth_v1_kafka_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
 var file_auth_v1_kafka_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
 var file_auth_v1_kafka_proto_goTypes = []any{
-	(*UserRegisteredEvent)(nil), // 0: auth.v1.UserRegisteredEvent
+	(ChangeType)(0),      // 0: auth.v1.ChangeType
+	(*ChangedEvent)(nil), // 1: auth.v1.ChangedEvent
 }
 var file_auth_v1_kafka_proto_depIdxs = []int32{
-	0, // [0:0] is the sub-list for method output_type
-	0, // [0:0] is the sub-list for method input_type
-	0, // [0:0] is the sub-list for extension type_name
-	0, // [0:0] is the sub-list for extension extendee
-	0, // [0:0] is the sub-list for field type_name
+	0, // 0: auth.v1.ChangedEvent.change_type:type_name -> auth.v1.ChangeType
+	1, // [1:1] is the sub-list for method output_type
+	1, // [1:1] is the sub-list for method input_type
+	1, // [1:1] is the sub-list for extension type_name
+	1, // [1:1] is the sub-list for extension extendee
+	0, // [0:1] is the sub-list for field type_name
 }
 
 func init() { file_auth_v1_kafka_proto_init() }
@@ -112,13 +181,14 @@ func file_auth_v1_kafka_proto_init() {
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_auth_v1_kafka_proto_rawDesc,
-			NumEnums:      0,
+			NumEnums:      1,
 			NumMessages:   1,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
 		GoTypes:           file_auth_v1_kafka_proto_goTypes,
 		DependencyIndexes: file_auth_v1_kafka_proto_depIdxs,
+		EnumInfos:         file_auth_v1_kafka_proto_enumTypes,
 		MessageInfos:      file_auth_v1_kafka_proto_msgTypes,
 	}.Build()
 	File_auth_v1_kafka_proto = out.File

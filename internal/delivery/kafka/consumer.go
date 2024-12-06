@@ -7,10 +7,11 @@ import (
 	"time"
 
 	"github.com/confluentinc/confluent-kafka-go/v2/kafka"
+	"github.com/rs/xid"
 	"github.com/rs/zerolog"
+	"google.golang.org/protobuf/proto"
 
 	ck "github.com/Karzoug/meower-common-go/kafka"
-
 	gen "github.com/Karzoug/meower-user-service/internal/delivery/kafka/gen/auth/v1"
 	"github.com/Karzoug/meower-user-service/internal/user/service"
 )
@@ -26,7 +27,7 @@ type consumer struct {
 }
 
 func NewConsumer(ctx context.Context, cfg Config, service service.UserService, logger zerolog.Logger) (consumer, error) {
-	const op = "create kafka consumer:"
+	const op = "create kafka consumer"
 
 	logger = logger.With().
 		Str("component", "kafka consumer").
@@ -40,7 +41,7 @@ func NewConsumer(ctx context.Context, cfg Config, service service.UserService, l
 		"enable.auto.offset.store": false,
 	})
 	if err != nil {
-		return consumer{}, fmt.Errorf("%s %w", op, err)
+		return consumer{}, fmt.Errorf("%s: %w", op, err)
 	}
 
 	var (
@@ -56,7 +57,7 @@ func NewConsumer(ctx context.Context, cfg Config, service service.UserService, l
 	// analog PING here
 	_, err = c.GetMetadata(&topic, false, timeout)
 	if err != nil {
-		return consumer{}, fmt.Errorf("%s failed to get metadata: %w", op, err)
+		return consumer{}, fmt.Errorf("%s: failed to get metadata: %w", op, err)
 	}
 
 	return consumer{
@@ -67,7 +68,7 @@ func NewConsumer(ctx context.Context, cfg Config, service service.UserService, l
 }
 
 func (c consumer) Run(ctx context.Context) (err error) {
-	userRegisteredEventCase := ck.MessageTypeHeaderValue(&gen.UserRegisteredEvent{})
+	authChangedEventFngpnt := ck.MessageTypeHeaderValue(&gen.ChangedEvent{})
 
 	defer func() {
 		if defErr := c.c.Close(); defErr != nil {
@@ -116,13 +117,27 @@ func (c consumer) Run(ctx context.Context) (err error) {
 
 			handlerLogger := c.logger.With().
 				Str("topic", *msg.TopicPartition.Topic).
+				Str("request_id", xid.New().String()).
 				Str("key", string(msg.Key)).
-				Str("event fingerprint", eventTypeFngpnt).
+				Str("event_fingerprint", eventTypeFngpnt).
 				Logger()
 
-			if eventTypeFngpnt == userRegisteredEventCase {
-				handlerLogger.Info().Msg("received message")
-				err = c.userRegisteredHandler(ctx, msg, handlerLogger)
+			if eventTypeFngpnt == authChangedEventFngpnt {
+				handlerLogger.Info().
+					Ctx(ctx).
+					Msg("received message")
+
+				event := &gen.ChangedEvent{}
+				if err := proto.Unmarshal(msg.Value, event); err != nil {
+					return fmt.Errorf("failed to deserialize payload: %w", err)
+				}
+
+				switch event.ChangeType {
+				case gen.ChangeType_CHANGE_TYPE_REGISTERED:
+					err = c.userRegisteredHandler(ctx, event, handlerLogger)
+				case gen.ChangeType_CHANGE_TYPE_DELETED:
+					err = c.userDeletedHandler(ctx, event, handlerLogger)
+				}
 			}
 
 			if err != nil {

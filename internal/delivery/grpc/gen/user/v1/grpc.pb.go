@@ -240,7 +240,7 @@ type User struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// id is unique and sortable user identifier
+	// ID is unique and sortable user identifier.
 	Id         string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	Username   string `protobuf:"bytes,2,opt,name=username,proto3" json:"username,omitempty"`
 	Name       string `protobuf:"bytes,3,opt,name=name,proto3" json:"name,omitempty"`
@@ -318,7 +318,7 @@ type UserShortProjection struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// id is unique and sortable user identifier
+	// ID is unique and sortable user identifier.
 	Id         string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	Username   string `protobuf:"bytes,2,opt,name=username,proto3" json:"username,omitempty"`
 	Name       string `protobuf:"bytes,3,opt,name=name,proto3" json:"name,omitempty"`

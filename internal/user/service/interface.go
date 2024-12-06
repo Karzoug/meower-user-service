@@ -9,12 +9,13 @@ import (
 )
 
 type repository interface {
-	Create(ctx context.Context, user entity.User) error
+	Create(ctx context.Context, user entity.User) (xid.ID, error)
 	GetOne(ctx context.Context, id xid.ID) (entity.User, error)
 	GetOneShortProjection(ctx context.Context, id xid.ID) (entity.UserShortProjection, error)
 	GetOneShortProjectionByUsername(ctx context.Context, username string) (entity.UserShortProjection, error)
 	GetManyShortProjections(ctx context.Context, ids []xid.ID) ([]entity.UserShortProjection, error)
 	Update(ctx context.Context, u entity.User) error
+	DeleteByUsername(ctx context.Context, username string) (xid.ID, error)
 }
 
 type shortProjectionsCache interface {

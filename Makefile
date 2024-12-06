@@ -119,12 +119,12 @@ migrate-create:
 dev-produce-user:
 	mkdir ${TEMP_DIR}/proto && cd ${TEMP_DIR}/proto && \
 	curl -H 'Accept: application/vnd.github.v3.raw' -O -L https://api.github.com/repos/Karzoug/meower-api/contents/proto/auth/v1/kafka.proto
-	$(TEMP_BIN)/protokaf produce UserRegisteredEvent \
+	$(TEMP_BIN)/protokaf produce ChangedEvent \
 		--broker localhost:9094 \
 		--proto ${TEMP_DIR}/proto/kafka.proto \
 		--topic auth \
-		--header "fngpnt=6ea518c537ab7e98ef0efb5482636ef0" \
-		--data '{"username": "$(username)"}'
+		--header "fngpnt=cee25ed946d449a7fb6ded06756619ba" \
+		--data '{"username": "$(username)", "change_type": 1}'
 	rm -rf ${TEMP_DIR}/proto
 
 # ==============================================================================

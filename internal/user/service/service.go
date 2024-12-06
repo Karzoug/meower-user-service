@@ -36,19 +36,20 @@ func NewUserService(cfg Config, repo repository, cache shortProjectionsCache, lo
 	}
 }
 
-// Create creates a new user.
-func (us UserService) Create(ctx context.Context, username string) error {
+// CreateByUsername creates a new user.
+func (us UserService) CreateByUsername(ctx context.Context, username string) (xid.ID, error) {
 	u := entity.NewUser(username)
-	if err := us.repo.Create(ctx, u); err != nil {
+	id, err := us.repo.Create(ctx, u)
+	if err != nil {
 		switch {
 		case errors.Is(err, repoerr.ErrRecordAlreadyExists):
-			return ucerr.NewError(err, "user already exists", codes.AlreadyExists)
+			return xid.NilID(), ucerr.NewError(err, "user already exists", codes.AlreadyExists)
 		default:
-			return ucerr.NewInternalError(err)
+			return xid.NilID(), ucerr.NewInternalError(err)
 		}
 	}
 
-	return nil
+	return id, nil
 }
 
 // Update updates an existing user.
@@ -94,6 +95,21 @@ func (us UserService) Get(ctx context.Context, id xid.ID) (entity.User, error) {
 	}
 
 	return u, nil
+}
+
+// DeleteByUsername deletes an existing user by username.
+func (us UserService) DeleteByUsername(ctx context.Context, username string) (xid.ID, error) {
+	id, err := us.repo.DeleteByUsername(ctx, username)
+	if err != nil {
+		switch {
+		case errors.Is(err, repoerr.ErrNoAffected):
+			return id, nil
+		default:
+			return xid.NilID(), ucerr.NewInternalError(err)
+		}
+	}
+
+	return id, nil
 }
 
 // GetShortProjection returns a short projection (for public display) of an existing user.
