@@ -16,18 +16,20 @@ import (
 )
 
 type UserService struct {
+	cfg                   Config
 	repo                  repository
 	shortProjectionsCache shortProjectionsCache
 	logger                zerolog.Logger
 }
 
 // NewUserService creates a new user service.
-func NewUserService(repo repository, cache shortProjectionsCache, logger zerolog.Logger) UserService {
+func NewUserService(cfg Config, repo repository, cache shortProjectionsCache, logger zerolog.Logger) UserService {
 	logger = logger.With().
 		Str("component", "user service").
 		Logger()
 
 	return UserService{
+		cfg:                   cfg,
 		repo:                  repo,
 		shortProjectionsCache: cache,
 		logger:                logger,
@@ -117,7 +119,7 @@ func (us UserService) GetShortProjection(ctx context.Context, id xid.ID) (entity
 	}
 
 	go func() {
-		if err := us.shortProjectionsCache.Set(id, user); err != nil {
+		if err := us.shortProjectionsCache.Set(id, user, us.cfg.Cache.TTLSeconds); err != nil {
 			us.logger.Error().
 				Err(err).
 				Msg("set short user info to cache failed")
@@ -165,7 +167,7 @@ func (us UserService) BatchGetShortProjections(ctx context.Context, ids []xid.ID
 
 	go func() {
 		for i := range missedUsers {
-			if err := us.shortProjectionsCache.Set(missedUsers[i].ID, missedUsers[i]); err != nil {
+			if err := us.shortProjectionsCache.Set(missedUsers[i].ID, missedUsers[i], us.cfg.Cache.TTLSeconds); err != nil {
 				us.logger.Error().
 					Err(err).
 					Msg("set short user info to cache failed")

@@ -20,5 +20,5 @@ type repository interface {
 type shortProjectionsCache interface {
 	GetOne(id xid.ID) (entity.UserShortProjection, error)
 	GetMany(ids []xid.ID) (users []entity.UserShortProjection, missed []xid.ID, err error)
-	Set(id xid.ID, u entity.UserShortProjection) error
+	Set(id xid.ID, u entity.UserShortProjection, ttl int32) error
 }
