@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/gob"
 	"errors"
+	"fmt"
 
 	"github.com/bradfitz/gomemcache/memcache"
 	"github.com/rs/xid"
@@ -25,24 +26,28 @@ func NewUserCache(client memcached.Client) cache {
 }
 
 func (c cache) GetOne(id xid.ID) (entity.UserShortProjection, error) {
+	const op = "memcached: get one user short projection"
+
 	item, err := c.client.Get(id.String())
 	if err != nil {
 		if errors.Is(err, memcache.ErrCacheMiss) {
 			return entity.UserShortProjection{}, repo.ErrRecordNotFound
 		}
-		return entity.UserShortProjection{}, err
+		return entity.UserShortProjection{}, fmt.Errorf("%s: %w", op, err)
 	}
 
 	b := bytes.NewReader(item.Value)
 	var ui entity.UserShortProjection
 	if err := gob.NewDecoder(b).Decode(&ui); err != nil {
-		return entity.UserShortProjection{}, err
+		return entity.UserShortProjection{}, fmt.Errorf("%s: %w", op, err)
 	}
 
 	return ui, nil
 }
 
 func (c cache) GetMany(ids []xid.ID) (users []entity.UserShortProjection, missed []xid.ID, err error) {
+	const op = "memcached: get many user short projections"
+
 	keys := make([]string, len(ids))
 	for i, id := range ids {
 		keys[i] = id.String()
@@ -50,7 +55,7 @@ func (c cache) GetMany(ids []xid.ID) (users []entity.UserShortProjection, missed
 
 	items, err := c.client.GetMulti(keys)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, fmt.Errorf("%s: %w", op, err)
 	}
 
 	res := make([]entity.UserShortProjection, 0, len(items))
@@ -58,8 +63,8 @@ func (c cache) GetMany(ids []xid.ID) (users []entity.UserShortProjection, missed
 	for _, item := range items {
 		b := bytes.NewReader(item.Value)
 		var ui entity.UserShortProjection
-		if err := gob.NewDecoder(b).Decode(&res); err != nil {
-			return nil, nil, err
+		if err := gob.NewDecoder(b).Decode(&ui); err != nil {
+			return nil, nil, fmt.Errorf("%s: %w", op, err)
 		}
 
 		res = append(res, ui)
