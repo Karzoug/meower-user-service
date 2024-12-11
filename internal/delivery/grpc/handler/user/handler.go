@@ -10,6 +10,7 @@ import (
 	"google.golang.org/grpc/status"
 
 	"github.com/Karzoug/meower-common-go/auth"
+
 	"github.com/Karzoug/meower-user-service/internal/delivery/grpc/converter"
 	gen "github.com/Karzoug/meower-user-service/internal/delivery/grpc/gen/user/v1"
 	"github.com/Karzoug/meower-user-service/internal/user/service"

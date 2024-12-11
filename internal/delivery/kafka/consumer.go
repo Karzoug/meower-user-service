@@ -12,6 +12,7 @@ import (
 	"google.golang.org/protobuf/proto"
 
 	ck "github.com/Karzoug/meower-common-go/kafka"
+
 	gen "github.com/Karzoug/meower-user-service/internal/delivery/kafka/gen/auth/v1"
 	"github.com/Karzoug/meower-user-service/internal/user/service"
 )
